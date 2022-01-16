@@ -1,13 +1,38 @@
 from torch.utils.data import Dataset
 import os
 import cv2
+import numpy as np
+from torchvision import transforms
+
+
+class Resize:
+    def __init__(self, size):
+        self.size = size
+
+    def __call__(self, image):
+        image = cv2.resize(image, (self.size, self.size))
+        return image
+
+
+class Normalize:
+    def __call__(self, image):
+        image = image.astype("float32") / 255.0
+        return image
+
+class ToTensor:
+    def __call__(self, image):
+        image = np.expand_dims(image, axis = 0)
+        image = image.transpose((2, 0, 1))
+
+        return image
+
 
 class CustomImageDataset(Dataset):
-    def __init__(self, dir_path):
+    def __init__(self, dir_path, size = 256):
         self._load(dir_path = dir_path)
 
-        for path in self.image_paths:
-            print(path)
+        self.transforms = transforms.Compose([Resize(size = size), Normalize(), ToTensor()])
+
 
 
 
@@ -17,7 +42,10 @@ class CustomImageDataset(Dataset):
 
     def __getitem__(self, idx):
         image_path = self.image_paths[idx]
-        image = cv2.imread(image_path, cv2.COLOR_BGR2GRAY)
+        image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+
+        processed_image = self.transforms(image)
 
         item = {"src" : image, "dst" : image}
 
@@ -60,7 +88,7 @@ def main():
     dataset = CustomImageDataset(dir_path = "/home/musa/data/images/natural_images/data/natural_images")
 
     for item in dataset:
-        print(item.keys())
+        print(item["src"].shape)
 
 if __name__ == "__main__":
     main()
