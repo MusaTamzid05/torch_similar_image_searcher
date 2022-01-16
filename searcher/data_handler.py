@@ -5,6 +5,7 @@ import numpy as np
 from torchvision import transforms
 
 
+
 class Resize:
     def __init__(self, size):
         self.size = size
@@ -22,14 +23,12 @@ class Normalize:
 class ToTensor:
     def __call__(self, image):
         image = np.expand_dims(image, axis = 0)
-        image = image.transpose((2, 0, 1))
-
         return image
 
 
 class CustomImageDataset(Dataset):
-    def __init__(self, dir_path, size = 256):
-        self._load(dir_path = dir_path)
+    def __init__(self,  dir_path, validation_dataset = False, size = 256):
+        self._load(dir_path = dir_path, validation_dataset = validation_dataset)
 
         self.transforms = transforms.Compose([Resize(size = size), Normalize(), ToTensor()])
 
@@ -47,22 +46,31 @@ class CustomImageDataset(Dataset):
 
         processed_image = self.transforms(image)
 
-        item = {"src" : image, "dst" : image}
+
+        item = {"src" : processed_image , "dst" : processed_image}
 
         return item
 
 
 
 
-    def _load(self, dir_path):
+    def _load(self, dir_path, validation_dataset):
         label_names = sorted(os.listdir(dir_path))
-        self.image_paths  = []
+        image_paths  = []
 
         for label_name in label_names:
             label_dir_path = os.path.join(dir_path, label_name)
             current_paths = self._load_image_paths(image_dir_path = label_dir_path)
 
-            self.image_paths += current_paths
+            image_paths += current_paths
+
+        train_index = int(0.8 * len(image_paths))
+
+        if validation_dataset == False:
+            self.image_paths = image_paths[:train_index]
+        else:
+            self.image_paths = image_paths[train_index:]
+
 
     def _load_image_paths(self, image_dir_path):
         image_names = os.listdir(image_dir_path)
@@ -72,20 +80,12 @@ class CustomImageDataset(Dataset):
             image_path = os.path.join(image_dir_path, image_name)
             image_paths.append(image_path)
 
-
         return image_paths
 
 
 
-
-
-
-
-
-
-
 def main():
-    dataset = CustomImageDataset(dir_path = "/home/musa/data/images/natural_images/data/natural_images")
+    dataset = CustomImageDataset(dir_path = "/home/musa/data/images/natural_images/data/natural_images", validation_dataset = True)
 
     for item in dataset:
         print(item["src"].shape)
