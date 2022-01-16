@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 from torchvision import transforms
 
+import torch
 
 
 class Resize:
@@ -23,7 +24,7 @@ class Normalize:
 class ToTensor:
     def __call__(self, image):
         image = np.expand_dims(image, axis = 0)
-        return image
+        return torch.from_numpy(image)
 
 
 class CustomImageDataset(Dataset):
