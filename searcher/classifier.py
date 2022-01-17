@@ -11,7 +11,7 @@ import numpy as np
 class Classifier:
     def __init__(self, data_dir_path):
         self.train_dataset = CustomImageDataset(dir_path = data_dir_path)
-        self.validation_dataset = CustomImageDataset(dir_path = data_dir_path, validation_dataset = False)
+        self.validation_dataset = CustomImageDataset(dir_path = data_dir_path, validation_dataset = True)
 
         self.device = "cuda" if torch.cuda.is_available() else  "cpu"
 
@@ -40,9 +40,9 @@ class Classifier:
     def _validate(self):
         validation_losses = []
 
-        for train_data in self.validation_data_loader:
-            x_batch = train_data["src"].to(self.device)
-            y_batch = train_data["label"].to(self.device)
+        for valid_data in self.validation_data_loader:
+            x_batch = valid_data["src"].to(self.device)
+            y_batch = valid_data["label"].to(self.device)
 
             self.model.eval()
             yhat = self.model(x_batch)
