@@ -8,6 +8,7 @@ from torch import nn
 import numpy as np
 
 import os
+import pickle
 
 
 class Classifier:
@@ -84,10 +85,17 @@ class Classifier:
         self._save(save_dir_path = save_dir_path, epoch_count = epochs)
 
     def _save(self, save_dir_path, epoch_count):
+        print("Saving")
         if os.path.isdir(save_dir_path) == False:
             os.mkdir(save_dir_path)
 
-        save_path = os.path.join(save_dir_path, f"epoch_{epoch_count}")
-        torch.save(self.model.state_dict(), save_path)
+        model_save_path = os.path.join(save_dir_path, f"epoch_{epoch_count}")
+        torch.save(self.model.state_dict(), model_save_path)
+
+        label_path = os.path.join(save_dir_path, "label.pickle")
+
+        with open(label_path, "wb") as f:
+            pickle.dump(self.train_dataset.label_to_encoder, f)
+
 
 

@@ -30,8 +30,10 @@ class ToTensor:
 
 class CustomImageDataset(Dataset):
     def __init__(self,  dir_path, validation_dataset = False, size = 256):
+        self.label_to_encoder = {}
         self._load(dir_path = dir_path, validation_dataset = validation_dataset)
         self.transforms = transforms.Compose([Resize(size = size), Normalize(), ToTensor()])
+
 
 
     def __len__(self):
@@ -72,6 +74,7 @@ class CustomImageDataset(Dataset):
         image_paths  = []
         labels = []
 
+
         for index, label_name in enumerate(label_names):
             label_dir_path = os.path.join(dir_path, label_name)
             current_paths = self._load_image_paths(image_dir_path = label_dir_path)
@@ -79,6 +82,8 @@ class CustomImageDataset(Dataset):
 
             encoded_label = [0 for _ in range(len(label_names))]
             encoded_label[index] = 1
+
+            self.label_to_encoder[label_name] = index
 
             labels += [encoded_label for _ in range(len(current_paths))]
 
