@@ -37,6 +37,24 @@ class Classifier:
         return np.mean(training_losses)
 
 
+    def _validate(self):
+        validation_losses = []
+
+        for train_data in self.validation_data_loader:
+            x_batch = train_data["src"].to(self.device)
+            y_batch = train_data["label"].to(self.device)
+
+            self.model.eval()
+            yhat = self.model(x_batch)
+
+            loss = self.loss_fn(y_batch, yhat)
+            self.optimizer.zero_grad()
+
+            validation_losses.append(loss.item())
+
+        return np.mean(validation_losses)
+
+
 
     def fit(self, epochs = 100,  batch_size = 16):
         num_classes = len(self.train_dataset[0]["label"])
@@ -57,6 +75,7 @@ class Classifier:
 
         for epoch in range(epochs):
             training_loss  = self._train()
-            print(f"Epoch {epoch} Training loss : {training_loss}")
+            validation_loss = self._validate()
+            print(f"Epoch {epoch} Training loss : {training_loss}  Validation loss : {validation_loss}")
 
 
