@@ -3,8 +3,11 @@ from searcher.data_handler import CustomImageDataset
 import numpy as np
 import torch
 
+from searcher.classifier import Classifier
+
 
 if __name__ == "__main__":
+    '''
     dataset = CustomImageDataset(dir_path = "/home/musa/data/images/natural_images/data/natural_images", validation_dataset = True)
     item = dataset[0]["src"]
 
@@ -13,6 +16,10 @@ if __name__ == "__main__":
     result = net.forward(item)
 
     print(result.shape)
+    '''
+
+    cls = Classifier(data_dir_path = "/home/musa/data/images/natural_images/data/natural_images")
+    cls.fit()
 
 
 
