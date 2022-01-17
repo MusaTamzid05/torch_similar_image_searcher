@@ -5,6 +5,7 @@ from searcher.models import Net
 import torch
 import torch.optim as optim
 from torch import nn
+import numpy as np
 
 
 class Classifier:
@@ -28,7 +29,11 @@ class Classifier:
         optimizer = optim.Adam(model.parameters(), lr = 0.01)
         loss_fn = nn.MSELoss(reduction = "mean")
 
+        print("Training started")
+
         for epoch in range(epochs):
+            training_losses = []
+
             for train_data in self.train_data_loader:
                 x_batch = train_data["src"].to(self.device)
                 y_batch = train_data["label"].to(self.device)
@@ -36,7 +41,15 @@ class Classifier:
                 model.train()
                 yhat = model(x_batch)
 
-                print(yhat)
+                loss = loss_fn(y_batch, yhat)
+                loss.backward()
 
+                optimizer.step()
+                optimizer.zero_grad()
+
+                training_losses.append(loss.item())
+
+
+            print(f"Epoch {epoch} Training loss : {np.mean(training_losses)}")
 
 
