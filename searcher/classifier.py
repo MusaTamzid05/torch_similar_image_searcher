@@ -7,6 +7,8 @@ import torch.optim as optim
 from torch import nn
 import numpy as np
 
+import os
+
 
 class Classifier:
     def __init__(self, data_dir_path):
@@ -56,7 +58,7 @@ class Classifier:
 
 
 
-    def fit(self, epochs = 100,  batch_size = 16):
+    def fit(self, epochs = 100,  batch_size = 16, save_dir_path = "./train_model"):
         num_classes = len(self.train_dataset[0]["label"])
 
         self.train_data_loader = DataLoader(self.train_dataset, batch_size = batch_size)
@@ -77,5 +79,15 @@ class Classifier:
             training_loss  = self._train()
             validation_loss = self._validate()
             print(f"Epoch {epoch} Training loss : {training_loss}  Validation loss : {validation_loss}")
+
+
+        self._save(save_dir_path = save_dir_path, epoch_count = epochs)
+
+    def _save(self, save_dir_path, epoch_count):
+        if os.path.isdir(save_dir_path) == False:
+            os.mkdir(save_dir_path)
+
+        save_path = os.path.join(save_dir_path, f"epoch_{epoch_count}")
+        torch.save(self.model.state_dict(), save_path)
 
 
