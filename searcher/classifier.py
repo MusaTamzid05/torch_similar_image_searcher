@@ -17,7 +17,11 @@ class Classifier:
         self.validation_dataset = CustomImageDataset(dir_path = data_dir_path, validation_dataset = True)
 
         self.device = "cuda" if torch.cuda.is_available() else  "cpu"
+        self.model_file_name = "model"
 
+
+    def load(self, model_dir):
+        model_path = os.path.join(model_dir, self.model_file_name)
 
     def _train(self):
         training_losses = []
@@ -82,14 +86,14 @@ class Classifier:
             print(f"Epoch {epoch} Training loss : {training_loss}  Validation loss : {validation_loss}")
 
 
-        self._save(save_dir_path = save_dir_path, epoch_count = epochs)
+        self._save(save_dir_path = save_dir_path)
 
-    def _save(self, save_dir_path, epoch_count):
+    def _save(self, save_dir_path):
         print("Saving")
         if os.path.isdir(save_dir_path) == False:
             os.mkdir(save_dir_path)
 
-        model_save_path = os.path.join(save_dir_path, f"epoch_{epoch_count}")
+        model_save_path = os.path.join(save_dir_path, self.model_file_name)
         torch.save(self.model.state_dict(), model_save_path)
 
         label_path = os.path.join(save_dir_path, "label.pickle")
