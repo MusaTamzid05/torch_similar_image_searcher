@@ -1,8 +1,3 @@
-from searcher.models import Net
-from searcher.data_handler import CustomImageDataset
-import numpy as np
-import torch
-
 from searcher.classifier import Classifier
 import argparse
 
