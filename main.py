@@ -12,7 +12,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
     cls = Classifier(data_dir_path = args.src_dst)
 
-    if os.path.isdir(args.model_dir):
+
+    model_path = os.path.join(args.model_dir, "model")
+
+
+    if os.path.exists(model_path):
         print("we are loading model")
         cls.load(model_dir = args.model_dir)
 
